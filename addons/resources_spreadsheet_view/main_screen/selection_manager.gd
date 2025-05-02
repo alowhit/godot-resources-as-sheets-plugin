@@ -57,6 +57,7 @@ func _draw():
 	var newline_char := 10
 	for i in edited_cells.size():
 		var cell : Control = get_cell_node_from_position(edited_cells[i])
+		if not cell: continue
 		var caret_rect := TextEditingUtilsClass.get_caret_rect(edited_cells_text[i], edit_cursor_positions[i], font, font_size, label_padding_left, 1.0)
 		caret_rect.position += cell.global_position - global_position
 		draw_rect(caret_rect, caret_color)
@@ -240,7 +241,7 @@ func _selection_changed():
 func _set_visible_selected(state : bool):	
 	for x in edited_cells:
 		var cell_node := get_cell_node_from_position(x)
-		if cell_node != null:
+		if cell_node != null and column_editors.size() > 0:
 			column_editors[get_cell_column(x)].set_selected(cell_node, state)
 
 
@@ -285,8 +286,30 @@ func _try_open_docks(cell : Vector2i):
 		x.visible = x.try_edit_value(editor_view.io.get_value(row, column), type, hints)
 		x.get_node(x.path_property_name).text = column
 
+var _queue_timer_inspector_update : Timer
+var _queue_inspector_update_list := []
+
+func _init_queue_timer() -> void:
+	if not _queue_timer_inspector_update:
+		_queue_timer_inspector_update = Timer.new()
+		_queue_timer_inspector_update.one_shot = true
+		_queue_timer_inspector_update.wait_time = 0.3
+		_queue_timer_inspector_update.name = "_QueueTimerInspectorUpdate"
+		_queue_timer_inspector_update.timeout.connect(_on_inspector_property_edited_queue_done)
+		add_child(_queue_timer_inspector_update)
+	_queue_timer_inspector_update.start()
 
 func _on_inspector_property_edited(property : String):
+	_init_queue_timer()
+	if not _queue_inspector_update_list.has(property):
+		_queue_inspector_update_list.append(property)
+
+func _on_inspector_property_edited_queue_done():
+	for v in _queue_inspector_update_list:
+		_on_inspector_property_edited_process(v)
+	_queue_inspector_update_list.clear()
+
+func _on_inspector_property_edited_process(property : String):
 	if !editor_view.is_visible_in_tree(): return
 	if inspector_resource != editor_view.editor_plugin.get_editor_interface().get_inspector().get_edited_object():
 		return

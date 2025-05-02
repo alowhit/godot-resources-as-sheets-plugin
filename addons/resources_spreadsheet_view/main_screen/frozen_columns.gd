@@ -55,6 +55,7 @@ func _on_grid_updated() -> void:
 
 func _on_scroll_updated(_new_value : float):
 	position = Vector2(0.0, -grid_scroll.scroll_vertical)
+	if children == null: return
 	for i in children.size():
 		children[i].size = children_copy_cells[i].size
 		children[i].position = children_copy_cells[i].position
