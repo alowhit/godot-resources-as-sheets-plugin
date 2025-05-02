@@ -4,6 +4,9 @@ extends Control
 signal cells_selected(cells_positions)
 signal cells_rightclicked(cells_positions)
 
+signal cells_deselected(cells_positions)
+signal cells_deselected_all()
+
 const EditorViewClass := preload("res://addons/resources_spreadsheet_view/editor_view.gd")
 const TextEditingUtilsClass := preload("res://addons/resources_spreadsheet_view/text_editing_utils.gd")
 
@@ -59,13 +62,14 @@ func _draw():
 		draw_rect(caret_rect, caret_color)
 
 
-func initialize_editors(column_values, column_types, column_hints):
+func initialize_editors(column_values, column_types, column_hints, column_hint_strings):
 	_set_visible_selected(false)
 	column_editors.clear()
 	for i in column_values.size():
 		for x in all_cell_editors:
-			if x.can_edit_value(column_values[i], column_types[i], column_hints[i], i):
+			if x.can_edit_value(column_values[i], column_types[i], column_hints[i], column_hint_strings[i], i):
 				column_editors.append(x)
+				#print(i, " using ", "column_editors's ", x.get_script().resource_path.get_file().get_basename())
 				break
 
 
@@ -286,7 +290,7 @@ func _on_inspector_property_edited(property : String):
 	if !editor_view.is_visible_in_tree(): return
 	if inspector_resource != editor_view.editor_plugin.get_editor_interface().get_inspector().get_edited_object():
 		return
-	
+	if edited_cells.is_empty(): return
 	if editor_view.columns[get_cell_column(edited_cells[0])] != property:
 		var columns := editor_view.columns
 		var previously_edited := edited_cells.duplicate()

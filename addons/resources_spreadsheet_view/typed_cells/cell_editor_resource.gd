@@ -5,7 +5,7 @@ const TablesPluginSettingsClass := preload("res://addons/resources_spreadsheet_v
 var previewer : EditorResourcePreview
 
 
-func can_edit_value(value, type, property_hint, column_index) -> bool:
+func can_edit_value(value, type, property_hint, property_hint_string, column_index) -> bool:
 	return type == TYPE_OBJECT
 
 

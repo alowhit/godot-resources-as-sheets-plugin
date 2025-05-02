@@ -1,0 +1,103 @@
+[gd_scene load_steps=7 format=3 uid="uid://b50yrdqb4gqoo"]
+
+[ext_resource type="Script" uid="uid://cnxj5kg7ace2m" path="res://addons/resources_spreadsheet_view/resource_script_reference/plugin_main_screen.gd" id="1_74yfy"]
+[ext_resource type="PackedScene" uid="uid://5pic6fxx6et3" path="res://addons/resources_spreadsheet_view/editor_view.tscn" id="1_vni73"]
+[ext_resource type="Script" uid="uid://dm5wlpm1812xn" path="res://addons/resources_spreadsheet_view/editor_icon_control.gd" id="2_r6mb8"]
+[ext_resource type="Script" uid="uid://cl1ag6tt247rb" path="res://addons/resources_spreadsheet_view/resource_script_reference/item_list_resource_class_history.gd" id="3_ehub0"]
+[ext_resource type="PackedScene" uid="uid://b4kfdjwkkhsb3" path="res://addons/resources_spreadsheet_view/resource_script_reference/selection_actions_for_item_list.tscn" id="4_3ny5q"]
+[ext_resource type="Script" uid="uid://cq1kp0yjuiq75" path="res://addons/resources_spreadsheet_view/resource_script_reference/input_handler_main_screen.gd" id="5_4twts"]
+
+[node name="plugin_main_screen" type="MarginContainer" node_paths=PackedStringArray("editor_view", "file_dialog", "alert_dialog", "item_list")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath(".")
+focus_next = NodePath(".")
+focus_previous = NodePath(".")
+focus_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_bottom = 5
+script = ExtResource("1_74yfy")
+editor_view = NodePath("HSplitContainer/Control")
+file_dialog = NodePath("Control/FileDialog")
+alert_dialog = NodePath("Control/AcceptDialog")
+item_list = NodePath("HSplitContainer/VBoxContainer/ItemList")
+
+[node name="HSplitContainer" type="HSplitContainer" parent="."]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HSplitContainer"]
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="HSplitContainer/VBoxContainer"]
+layout_mode = 2
+script = ExtResource("2_r6mb8")
+icon_name = "Search"
+
+[node name="ItemList" type="ItemList" parent="HSplitContainer/VBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_vertical = 3
+item_count = 1
+script = ExtResource("3_ehub0")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HSplitContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Button_AddResourceToList" type="Button" parent="HSplitContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Add Res To List"
+script = ExtResource("2_r6mb8")
+icon_name = "Folder"
+
+[node name="Button_CreateResource" type="Button" parent="HSplitContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Create Res To Table"
+script = ExtResource("2_r6mb8")
+icon_name = "Duplicate"
+
+[node name="Control" parent="HSplitContainer" instance=ExtResource("1_vni73")]
+layout_mode = 2
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="FileDialog" type="FileDialog" parent="Control"]
+title = "Open"
+initial_position = 2
+size = Vector2i(800, 500)
+min_size = Vector2i(800, 400)
+ok_button_text = "Open"
+mode_overrides_title = false
+file_mode = 1
+filters = PackedStringArray("*.gd")
+
+[node name="AcceptDialog" type="AcceptDialog" parent="Control"]
+initial_position = 2
+
+[node name="SelectionActions" parent="." node_paths=PackedStringArray("main_screen", "editor_view", "item_list") instance=ExtResource("4_3ny5q")]
+visible = false
+layout_mode = 2
+main_screen = NodePath("..")
+editor_view = NodePath("../HSplitContainer/Control")
+item_list = NodePath("../HSplitContainer/VBoxContainer/ItemList")
+
+[node name="Input_handler_main_screen" type="Node" parent="."]
+script = ExtResource("5_4twts")
+
+[connection signal="gui_input" from="." to="Input_handler_main_screen" method="_gui_input"]
+[connection signal="text_changed" from="HSplitContainer/VBoxContainer/LineEdit" to="HSplitContainer/VBoxContainer/ItemList" method="_on_line_edit_text_changed"]
+[connection signal="empty_clicked" from="HSplitContainer/VBoxContainer/ItemList" to="Input_handler_main_screen" method="_on_item_list_empty_clicked"]
+[connection signal="item_clicked" from="HSplitContainer/VBoxContainer/ItemList" to="Input_handler_main_screen" method="_on_item_list_item_clicked"]
+[connection signal="pressed" from="HSplitContainer/VBoxContainer/VBoxContainer/Button_AddResourceToList" to="." method="_on_add_resource_button_pressed"]
+[connection signal="pressed" from="HSplitContainer/VBoxContainer/VBoxContainer/Button_CreateResource" to="." method="_on_button_create_resource_pressed"]
+[connection signal="grid_updated" from="HSplitContainer/Control" to="." method="_on_editor_view_grid_updated"]
+[connection signal="confirmed" from="Control/FileDialog" to="." method="_on_file_dialog_confirmed"]

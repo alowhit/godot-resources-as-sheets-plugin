@@ -20,7 +20,7 @@ func _resize_color_rect(rect):
 	rect.set_anchors_and_offsets_preset(Control.PRESET_LEFT_WIDE, Control.PRESET_MODE_KEEP_WIDTH)
 
 
-func can_edit_value(value, type, property_hint, property_hint_string) -> bool:
+func can_edit_value(value, type, property_hint, property_hint_string, column_index) -> bool:
 	return type == TYPE_COLOR
 
 

@@ -9,7 +9,7 @@ var hint_strings_array := []
 
 
 ## Override to define where the cell should be shown.
-func can_edit_value(value, type, property_hint, column_index) -> bool:
+func can_edit_value(value, type, property_hint, property_hint_string, column_index) -> bool:
 	return value != null
 
 ## Override to change how the cell is created; preload a scene or create nodes from code.

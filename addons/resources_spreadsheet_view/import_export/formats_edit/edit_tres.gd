@@ -9,6 +9,7 @@ func get_value(entry, key : String):
 
 
 func set_value(entry, key : String, value, index : int):
+	#print(entry, ", ", key, ", ", value, ", ", index)
 	var prev_value = entry[key]
 	if prev_value is StringName:
 		entry[key] = StringName(value)
@@ -62,6 +63,7 @@ func rename_row(row, new_name : String):
 
 	var new_row = row
 	DirAccess.open("res://").remove(row.resource_path)
+	editor_view.editor_interface.get_resource_filesystem().update_file(row.resource_path)
 	new_row.resource_path = new_path
 	ResourceSaver.save(new_row)
 
@@ -69,6 +71,9 @@ func rename_row(row, new_name : String):
 func delete_rows(rows):
 	for x in rows:
 		DirAccess.open("res://").remove(x.resource_path)
+		editor_view.editor_interface.get_resource_filesystem().update_file(x.resource_path)
+	editor_view.reset_selection()
+	#editor_view.editor_interface.get_resource_filesystem().scan()
 
 
 func has_row_names():

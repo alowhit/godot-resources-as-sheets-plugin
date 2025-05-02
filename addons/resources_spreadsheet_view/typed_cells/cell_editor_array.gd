@@ -3,7 +3,14 @@ extends ResourceTablesCellEditor
 const TablesPluginSettingsClass := preload("res://addons/resources_spreadsheet_view/settings_grid.gd")
 
 
-func can_edit_value(value, type, property_hint, column_index) -> bool:
+func can_edit_value(value, type, property_hint, property_hint_string, column_index) -> bool:
+	#if type == TYPE_PACKED_STRING_ARRAY or type == TYPE_ARRAY:
+		#if property_hint == PROPERTY_HINT_TYPE_STRING:
+			##print(value, ",", type, ",", property_hint, ",",property_hint_string, ",", column_index)
+			#if property_hint_string[0].begins_with("24/17"):
+				#print("Array from ", column_index, " can't edit")
+				#return false
+			
 	return type == TYPE_PACKED_STRING_ARRAY or type == TYPE_ARRAY
 
 
@@ -16,6 +23,7 @@ func set_value(node : Control, value):
 	node.custom_minimum_size.x = ProjectSettings.get_setting(TablesPluginSettingsClass.PREFIX + "array_min_width")
 	var color_tint : float = 0.01 * ProjectSettings.get_setting(TablesPluginSettingsClass.PREFIX + "array_color_tint", 100.0)
 	var cell_label_mode : int = ProjectSettings.get_setting(TablesPluginSettingsClass.PREFIX + "resource_cell_label_mode", 0)
+	if value == null : return
 	while children.size() < value.size():
 		children.append(Label.new())
 		node.get_node("Box").add_child(children[children.size() - 1])

@@ -1,12 +1,15 @@
 @tool
 extends EditorPlugin
 
+var plugin_main_screen : Control
 var editor_view : Control
 var undo_redo : EditorUndoRedoManager
 
 
 func _enter_tree() -> void:
-	editor_view = load(get_script().resource_path.get_base_dir() + "/editor_view.tscn").instantiate()
+	plugin_main_screen = load(get_script().resource_path.get_base_dir() + "/resource_script_reference/plugin_main_screen.tscn").instantiate()
+	#editor_view = load(get_script().resource_path.get_base_dir() + "/editor_view.tscn").instantiate()
+	editor_view = plugin_main_screen.editor_view
 	editor_view.editor_interface = get_editor_interface()
 	if editor_view.editor_interface == null:
 		# 4.2: now a singleton
@@ -14,13 +17,18 @@ func _enter_tree() -> void:
 
 	editor_view.editor_plugin = self
 	undo_redo = get_undo_redo()
-	get_editor_interface().get_editor_main_screen().add_child(editor_view)
+	editor_view.name = _get_plugin_name()
+	plugin_main_screen.name = _get_plugin_name()
+	#get_editor_interface().get_editor_main_screen().add_child(editor_view)
+	get_editor_interface().get_editor_main_screen().add_child(plugin_main_screen)
 	_make_visible(false)
 
 
 func _exit_tree() -> void:
-	if is_instance_valid(editor_view):
-		editor_view.queue_free()
+	if is_instance_valid(plugin_main_screen):
+		plugin_main_screen.queue_free()
+	#if is_instance_valid(editor_view):
+		#editor_view.queue_free()
 
 
 func _get_plugin_name():
@@ -28,8 +36,10 @@ func _get_plugin_name():
 
 
 func _make_visible(visible):
-	if is_instance_valid(editor_view):
-		editor_view.visible = visible
+	if is_instance_valid(plugin_main_screen):
+		plugin_main_screen.visible = visible
+	#if is_instance_valid(editor_view):
+		#editor_view.visible = visible
 		if visible:
 			editor_view.display_folder(editor_view.current_path)
 

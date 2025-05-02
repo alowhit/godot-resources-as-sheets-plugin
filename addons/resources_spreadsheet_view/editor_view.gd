@@ -40,6 +40,8 @@ var last_row := 0
 
 
 func _ready():
+	editor_plugin.scene_saved.connect(_on_scene_saved)
+	editor_plugin.resource_saved.connect(_on_resource_saved)
 	editor_interface.get_resource_filesystem().filesystem_changed.connect(_on_filesystem_changed)
 	if FileAccess.file_exists(save_data_path):
 		var file := FileAccess.open(save_data_path, FileAccess.READ)
@@ -164,7 +166,6 @@ func display_resources(resource_array : Array):
 	node_columns.update()
 	grid_updated.emit()
 
-
 func refresh(force_rebuild : bool = true):
 	if current_path == "":
 		display_resources(rows)
@@ -228,7 +229,7 @@ func fill_property_data(res : Resource):
 			column_hint_strings.append(x[&"hint_string"].split(","))
 			column_values.append(io.get_value(res, columns[i]))
 
-	_selection.initialize_editors(column_values, column_types, column_hints)
+	_selection.initialize_editors(column_values, column_types, column_hints, column_hint_strings)
 
 
 func fill_property_data_many(resources : Array):
@@ -264,7 +265,7 @@ func fill_property_data_many(resources : Array):
 			column_hint_strings.append(x[&"hint_string"].split(","))
 			column_values.append(io.get_value(x[&"owner_object"], columns[i]))
 
-	_selection.initialize_editors(column_values, column_types, column_hints)
+	_selection.initialize_editors(column_values, column_types, column_hints, column_hint_strings)
 
 
 func can_display_property(property_info : Dictionary):
@@ -377,6 +378,8 @@ func select_column(column_index : int):
 	_selection.select_cell(Vector2i(column_index, 0))
 	_selection.select_cells_to(Vector2i(column_index, rows.size() - 1))
 
+func reset_selection():
+	_selection.deselect_all_cells()
 
 func set_edited_cells_values_text(new_cell_values : Array):
 	var column_editor : Object = _selection.column_editors[get_selected_column()]
@@ -535,3 +538,24 @@ func _on_File_pressed():
 
 func _on_SearchProcess_pressed():
 	$"HeaderContentSplit/VBoxContainer/Search".visible = !$"HeaderContentSplit/VBoxContainer/Search".visible
+
+func _on_resource_saved(_res: Resource):
+	queue_refresh()
+
+func _on_scene_saved(_path: String):
+	queue_refresh()
+
+var timer : Timer
+
+func _init_queue_timer() -> void:
+	if not timer:
+		timer = Timer.new()
+		timer.one_shot = true
+		timer.wait_time = 0.1
+		timer.timeout.connect(refresh)
+		timer.name = "_queueTimer"
+		add_child(timer)
+	timer.start()
+
+func queue_refresh():
+	_init_queue_timer()

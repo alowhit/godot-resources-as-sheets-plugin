@@ -55,13 +55,18 @@ func open(cells : Array, pin_to_cell : bool = false, from_leftclick : bool = fal
 		cell = null
 		set_deferred(&"global_position", get_global_mouse_position() + Vector2.ONE)
 
-	show()
-	size = Vector2.ZERO
+	
 	top_level = true
 	$"Control2/Label".text = str(cells.size()) + (" Cells" if cells.size() % 10 != 1 else " Cell")
-	$"GridContainer/Rename".visible = editor_view.has_row_names()
-	$"GridContainer/SoloOpen".visible = editor_view.column_can_solo_open(editor_view.get_selected_column())
+	$"GridContainer/Rename".set_visible(editor_view.has_row_names())
+	$"GridContainer/SoloOpen".set_visible(editor_view.column_can_solo_open(editor_view.get_selected_column()))
+	
+	var _rpath : String = editor_view.get_last_selected_row().resource_path
+	var _uid : int = ResourceLoader.get_resource_uid(_rpath)
+	$"GridContainer/CopyResourceUID".set_visible(_uid > -1)
 
+	reset_size()
+	show()
 
 func close():
 	pass
@@ -188,4 +193,12 @@ func _on_editbox_accepted():
 		EDITBOX_DELETE:
 			editor_view.delete_selected_rows()
 
+	_on_editbox_closed()
+
+
+func _on_copy_resource_uid_pressed() -> void:
+	var _rpath : String = editor_view.get_last_selected_row().resource_path
+	var _uid : int = ResourceLoader.get_resource_uid(_rpath)
+	DisplayServer.clipboard_set(ResourceUID.id_to_text(_uid))
+	
 	_on_editbox_closed()
