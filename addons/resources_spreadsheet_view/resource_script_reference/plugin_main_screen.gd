@@ -35,8 +35,8 @@ func _on_add_resource_button_pressed() -> void:
 
 
 func _on_button_create_resource_pressed() -> void:
-	print(item_list.selected_builtin)
-	print(item_list.selected_script)
+	#print(item_list.selected_builtin)
+	#print(item_list.selected_script)
 	if item_list.is_anything_selected():
 		selection.open()
 		selection._on_Duplicate_pressed()
@@ -47,6 +47,7 @@ func create_resource(name_input : String, arg: Array = []):
 	var o : Object
 	if ResourceLoader.has_cached(_path):
 		o = ResourceLoader.get_cached_ref(_path)
+		print("NOTICE: THIS IS FROM CACHED, SO THERE MUST BE ERROR ON REFERENCE")
 	if item_list.selected_script != null:
 		if o == null:
 			o = Resource.new()
