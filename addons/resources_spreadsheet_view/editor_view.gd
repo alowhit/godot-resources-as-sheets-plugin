@@ -194,8 +194,8 @@ func _load_resources_from_path(path : String, sort_by : StringName, sort_reverse
 
 func _update_visible_rows(force_rebuild : bool = true):
 	node_page_manager.update_page_count(rows)
-	if columns.size() == 0:
-		return
+	#if columns.size() == 0:
+		#return
 
 	if force_rebuild or columns != node_columns.columns:
 		for x in node_table_root.get_children():
@@ -405,28 +405,33 @@ func set_edited_cells_values(new_cell_values : Array):
 	var column : int = _selection.get_cell_column(_selection.edited_cells[0])
 	var edited_cells_resources := _get_row_resources(edited_rows)
 
-	editor_plugin.undo_redo.create_action("Set Cell Values")
-	editor_plugin.undo_redo.add_undo_method(
-		self,
-		&"_update_resources",
-		edited_cells_resources.duplicate(),
-		edited_rows.duplicate(),
-		column,
-		get_edited_cells_values()
-	)
-	editor_plugin.undo_redo.add_undo_method(
-		_selection,
-		&"_update_selected_cells_text"
-	)
-	editor_plugin.undo_redo.add_do_method(
-		self,
-		&"_update_resources",
-		edited_cells_resources.duplicate(),
+	#editor_plugin.undo_redo.create_action("Set Cell Values")
+	#editor_plugin.undo_redo.add_undo_method(
+		#self,
+		#&"_update_resources",
+		#edited_cells_resources.duplicate(),
+		#edited_rows.duplicate(),
+		#column,
+		#get_edited_cells_values()
+	#)
+	#editor_plugin.undo_redo.add_undo_method(
+		#_selection,
+		#&"_update_selected_cells_text"
+	#)
+	#editor_plugin.undo_redo.add_do_method(
+		#self,
+		#&"_update_resources",
+		#edited_cells_resources.duplicate(),
+		#edited_rows.duplicate(),
+		#column,
+		#new_cell_values.duplicate()
+	#)
+	#editor_plugin.undo_redo.commit_action(true)
+	_update_resources(edited_cells_resources.duplicate(),
 		edited_rows.duplicate(),
 		column,
 		new_cell_values.duplicate()
 	)
-	editor_plugin.undo_redo.commit_action(true)
 	_selection._update_selected_cells_text()
 
 
