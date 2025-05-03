@@ -20,14 +20,18 @@ func set_value(entry, key : String, value, index : int):
 		return
 
 	if prev_value is float:
+		if typeof(value) == TYPE_NIL:
+			value = prev_value
 		entry[key] = float(value)
 		return
 
 	if prev_value is int:
+		if typeof(value) == TYPE_NIL:
+			value = prev_value
 		entry[key] = int(value)
 		return
 
-	entry[key] = value
+	entry.set(key, value)#entry[key] = value
 
 func save_entries(all_entries : Array, indices : Array, repeat : bool = true):
 	# No need to save. Resources are saved with Ctrl+S
